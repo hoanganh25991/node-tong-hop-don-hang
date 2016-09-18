@@ -112,53 +112,53 @@ var matchedOnListProduct = function(term){
 console.log(matchedOnListProduct('Hành lá'));
 
 /* call out repl to work with user */
-const readline = require('readline');
+// const readline = require('readline');
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+// const rl = readline.createInterface({
+//   input: process.stdin,
+//   output: process.stdout
+// });
 
-rl.question('What do you think of Node.js? ', (answer) => {
-  // TODO: Log the answer in a database
-  console.log('Thank you for your valuable feedback:', answer);
+// rl.question('What do you think of Node.js? ', (answer) => {
+//   // TODO: Log the answer in a database
+//   console.log('Thank you for your valuable feedback:', answer);
 
-  rl.close();
-});
+//   rl.close();
+// });
 
-/* wrap function */
-/* read info from range A4: A72 */
-var getRangeVal = function(rangeString){
-	range = XLSX.utils.decode_range(rangeString);
+// /* wrap function */
+// /* read info from range A4: A72 */
+// var getRangeVal = function(rangeString){
+// 	range = XLSX.utils.decode_range(rangeString);
 
-	var list = [];
+// 	var list = [];
 
-	for(var R = range.s.r; R <= range.e.r; ++R) {
-		for(var C = range.s.c; C <= range.e.c; ++C) {
-			var cell_address = {c:C, r:R};
-			 // Find desired cell
-			var address_of_cell = XLSX.utils.encode_cell(cell_address);
-			var desired_cell = worksheet[address_of_cell];
-			var val = desired_cell ? desired_cell.v : 0;
+// 	for(var R = range.s.r; R <= range.e.r; ++R) {
+// 		for(var C = range.s.c; C <= range.e.c; ++C) {
+// 			var cell_address = {c:C, r:R};
+// 			 // Find desired cell
+// 			var address_of_cell = XLSX.utils.encode_cell(cell_address);
+// 			var desired_cell = worksheet[address_of_cell];
+// 			var val = desired_cell ? desired_cell.v : 0;
 			
-			list.push(val);
-		}
-	}
-	return list;
-}
+// 			list.push(val);
+// 		}
+// 	}
+// 	return list;
+// }
 
-console.log(getRangeVal('J4:J72'));
+// console.log(getRangeVal('J4:J72'));
 
-var fs = require('fs');
+// var fs = require('fs');
 
-var fs = require('fs');
+// var fs = require('fs');
 
-fs.readdir(excelFolder, function(err, items) {
-	items.forEach(function(item){
-		var p = /^~\$/g;
-		console.log(p.test(item));
-	});
-});
+// fs.readdir(excelFolder, function(err, items) {
+// 	items.forEach(function(item){
+// 		var p = /^~\$/g;
+// 		console.log(p.test(item));
+// 	});
+// });
 
 // var listFile
 
@@ -186,4 +186,19 @@ var list_DonHang = function(excelFolder){
 };
 
 console.log(list_DonHang(excelFolder));
+
+/* bookType can be 'xlsx' or 'xlsm' or 'xlsb' */
+// var wopts = { bookType:'xlsx', bookSST:false, type:'binary' };
+
+// var wbout = XLSX.write(workbook,wopts);
+
+// function s2ab(s) {
+//   var buf = new ArrayBuffer(s.length);
+//   var view = new Uint8Array(buf);
+//   for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+//   return buf;
+// }
+
+// /* the saveAs call downloads a file on the local machine */
+// saveAs(new Blob([s2ab(wbout)],{type:""}), "test.xlsx")
 
