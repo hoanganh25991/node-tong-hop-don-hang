@@ -151,17 +151,39 @@ console.log(getRangeVal('J4:J72'));
 
 var fs = require('fs');
 
-var list_DonHang = [];
+var fs = require('fs');
 
 fs.readdir(excelFolder, function(err, items) {
 	items.forEach(function(item){
 		var p = /^~\$/g;
 		console.log(p.test(item));
 	});
-	
 });
 
+// var listFile
 
+// var workbook = XLSX.readFile(p(excelFolder, 'Đơn hàng VFFM.xlsx'));
 
+// var first_sheet_name = workbook.SheetNames[0];
 
+// var worksheet = workbook.Sheets[first_sheet_name];
+
+var list_DonHang = function(excelFolder){
+	var fs = require('fs');
+
+	var list_DonHang = [];
+
+	var items = fs.readdirSync(excelFolder);
+	console.log(items);
+	items.forEach(function(item){
+		var p = /^~\$|^\.|^\../;
+		console.log(p.test(item));
+		p.test(item) != true ? function(){
+			list_DonHang.push(item);
+		}() : false;
+	});
+	return list_DonHang;
+};
+
+console.log(list_DonHang(excelFolder));
 
