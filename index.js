@@ -149,6 +149,18 @@ var getRangeVal = function(rangeString){
 
 console.log(getRangeVal('J4:J72'));
 
+var fs = require('fs');
+
+var list_DonHang = [];
+
+fs.readdir(excelFolder, function(err, items) {
+	items.forEach(function(item){
+		var p = /^~\$/g;
+		console.log(p.test(item));
+	});
+	
+});
+
 
 
 
