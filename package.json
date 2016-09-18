@@ -1,0 +1,17 @@
+{
+  "name": "project x",
+  "version": "1.0.0",
+  "description": "project x",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anh Le Hoang",
+  "license": "MIT",
+  "dependencies": {
+    "exceljs": "^0.2.24",
+    "natural": "^0.4.0",
+    "readline-sync": "^1.4.4",
+    "xlsx": "^0.8.0"
+  }
+}
