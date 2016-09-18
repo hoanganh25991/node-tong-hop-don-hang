@@ -1,16 +1,27 @@
 var Excel = require('exceljs');
 
-var workbook = new Excel.Workbook();
+var file_TongHop = new Excel.Workbook();
 
-workbook.creator = 'Anh Le Hoang';
-workbook.lastModifiedBy = 'Anh Le Hoang';
-workbook.created = new Date(1991, 9, 25);
-workbook.modified = new Date();
+file_TongHop.creator = 'Anh Le Hoang';
+file_TongHop.lastModifiedBy = 'Anh Le Hoang';
+file_TongHop.created = new Date(1991, 9, 25);
+file_TongHop.modified = new Date();
 
-var sheet = workbook.addWorksheet('don-hang');
+var sheet = file_TongHop.addWorksheet('don-hang');
 
-workbook.xlsx
+file_TongHop.xlsx
 		.writeFile('tong-hop.xlsx')
 		.then(function() {
 			console.log('save to tong-hop');
 		});
+
+
+var donHang = new Excel.Workbook();
+
+donHang.xlsx
+		.readFile('./test/excel-file/Đơn hàng VFFM.xlsx')
+		.then(function() {
+		    console.log('read file success');
+		});
+
+

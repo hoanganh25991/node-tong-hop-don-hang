@@ -126,30 +126,28 @@ console.log(matchedOnListProduct('Hành lá'));
 //   rl.close();
 // });
 
-// /* wrap function */
-// /* read info from range A4: A72 */
-// var getRangeVal = function(rangeString){
-// 	range = XLSX.utils.decode_range(rangeString);
+/* wrap function */
+/* read info from range A4: A72 */
+var getRangeVal = function(rangeString, worksheet){
+	range = XLSX.utils.decode_range(rangeString);
 
-// 	var list = [];
+	var list = [];
 
-// 	for(var R = range.s.r; R <= range.e.r; ++R) {
-// 		for(var C = range.s.c; C <= range.e.c; ++C) {
-// 			var cell_address = {c:C, r:R};
-// 			 // Find desired cell
-// 			var address_of_cell = XLSX.utils.encode_cell(cell_address);
-// 			var desired_cell = worksheet[address_of_cell];
-// 			var val = desired_cell ? desired_cell.v : 0;
+	for(var R = range.s.r; R <= range.e.r; ++R) {
+		for(var C = range.s.c; C <= range.e.c; ++C) {
+			var cell_address = {c:C, r:R};
+			 // Find desired cell
+			var address_of_cell = XLSX.utils.encode_cell(cell_address);
+			var desired_cell = worksheet[address_of_cell];
+			var val = desired_cell ? desired_cell.v : 0;
 			
-// 			list.push(val);
-// 		}
-// 	}
-// 	return list;
-// }
+			list.push(val);
+		}
+	}
+	return list;
+}
 
-// console.log(getRangeVal('J4:J72'));
-
-// var fs = require('fs');
+console.log(getRangeVal('J4:J72', worksheet));
 
 // var fs = require('fs');
 
@@ -160,13 +158,11 @@ console.log(matchedOnListProduct('Hành lá'));
 // 	});
 // });
 
-// var listFile
+var workbook = XLSX.readFile(p(excelFolder, 'Đơn hàng VFFM.xlsx'));
 
-// var workbook = XLSX.readFile(p(excelFolder, 'Đơn hàng VFFM.xlsx'));
+var first_sheet_name = workbook.SheetNames[0];
 
-// var first_sheet_name = workbook.SheetNames[0];
-
-// var worksheet = workbook.Sheets[first_sheet_name];
+var worksheet = workbook.Sheets[first_sheet_name];
 
 var list_DonHang = function(excelFolder){
 	var fs = require('fs');
@@ -186,7 +182,7 @@ var list_DonHang = function(excelFolder){
 };
 
 console.log(list_DonHang(excelFolder));
-
+var listDonHang = list_DonHang(excelFolder);
 /* bookType can be 'xlsx' or 'xlsm' or 'xlsb' */
 // var wopts = { bookType:'xlsx', bookSST:false, type:'binary' };
 
@@ -201,4 +197,57 @@ console.log(list_DonHang(excelFolder));
 
 // /* the saveAs call downloads a file on the local machine */
 // saveAs(new Blob([s2ab(wbout)],{type:""}), "test.xlsx")
+
+// var Excel = require('exceljs');
+
+// var file_TongHop = new Excel.Workbook();
+
+// file_TongHop.creator = 'Anh Le Hoang';
+// file_TongHop.lastModifiedBy = 'Anh Le Hoang';
+// file_TongHop.created = new Date(1991, 9, 25);
+// file_TongHop.modified = new Date();
+
+// var sheet = file_TongHop.addWorksheet('don-hang');
+
+// file_TongHop.xlsx
+// 		.writeFile('tong-hop.xlsx')
+// 		.then(function() {
+// 			console.log('save to tong-hop');
+// 		});
+
+//read back from file_TongHop by xlsx
+
+// var file_TongHop = XLSX.readFile('tong hop 1.xlsx');
+
+// var sheet1 = file_TongHop.Sheets[file_TongHop.SheetNames[0]];
+
+// sheet1['A1'].v = 'product name';
+
+// console.log(sheet1['A1'].v);
+
+// XLSX.writeFile(file_TongHop);
+
+var arr = [];
+
+var repl = require('repl');
+
+arr.push(['product name', 'company name']);
+
+var readWhere = {};
+
+var readlineSync = require('readline-sync');
+
+// console.log(listDonHang);
+
+listDonHang.forEach(function(donHang){
+	readWhere[donHang] = readlineSync.question(util.format('in \033[01;32m%s\033[0m, where product name :', donHang));
+});
+
+console.log(readWhere);
+
+process.on('exit', function(){
+	console.log('build sucesss');
+});
+
+
 
