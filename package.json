@@ -1,7 +1,7 @@
 {
-  "name": "project x",
+  "name": "node-tong-hop-dat-hang",
   "version": "1.0.0",
-  "description": "project x",
+  "description": "node-tong-hop-dat-hang",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
