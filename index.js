@@ -126,6 +126,29 @@ rl.question('What do you think of Node.js? ', (answer) => {
   rl.close();
 });
 
+/* wrap function */
+/* read info from range A4: A72 */
+var getRangeVal = function(rangeString){
+	range = XLSX.utils.decode_range(rangeString);
+
+	var list = [];
+
+	for(var R = range.s.r; R <= range.e.r; ++R) {
+		for(var C = range.s.c; C <= range.e.c; ++C) {
+			var cell_address = {c:C, r:R};
+			 // Find desired cell
+			var address_of_cell = XLSX.utils.encode_cell(cell_address);
+			var desired_cell = worksheet[address_of_cell];
+			var val = desired_cell ? desired_cell.v : 0;
+			
+			list.push(val);
+		}
+	}
+	return list;
+}
+
+console.log(getRangeVal('J4:J72'));
+
 
 
 
