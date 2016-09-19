@@ -100,6 +100,7 @@ var mostMatch = function(term, list){
 	// if(mostMatch < 0.8){
 	// 	pos = -1; //selft determine that, now thing most matched here;
 	// }
+	// console.log(pos);
 	return pos;
 };
 
@@ -118,30 +119,40 @@ config.products.forEach(function(p){
 
 var headerCompany = [null];
 
+// console.log(data);
 
-where.forEach(function(row){
+where.forEach(function(row, donHangX){
 	var file = row.file;
 	var rangeProduct = row.rangeProduct;
 	var rangeValue = row.rangeValue;
 
 	var workbook = XLSX.readFile(util.format('%s/%s', excelFolder, file));
 
-	headerCompany.push(file.replace('Đơn hàng ', ''));
+	headerCompany.push(file.replace('Đơn hàng ', '').replace('.xlsx', ''));
 
 	var worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
 	var listData = getValOfRange(rangeProduct, rangeValue, worksheet);
 
-	console.log(listData);
-
+	// console.log(listData);
+	
 	listData.forEach(function(tmp){
 		var pos = posInListProduct(tmp.name);
+		// console.log(tmp.name, pos);
 		pos != -1 ? function(){
 			data[pos].push(tmp.val); //2 san pham cung mot ma > push ko theo cot
 		}() :
 		function(){
 			console.log(util.format('\033[01;31m[E]\033[0m File: %s, Product: %s, Val: %s', file, tmp.name, tmp.val));
 		}()
+	});
+
+	//fill in data, which is empty by null
+	data.forEach(function(row){
+		//the first index is product-name
+		row[(donHangX + 1)] == undefined ? function(){
+			row[(donHangX + 1)] = null;
+		}(): false;
 	});
 });
 
