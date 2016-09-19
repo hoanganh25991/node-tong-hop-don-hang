@@ -1,14 +1,4 @@
-// browserify index-handsontable.js -o bundle.js -r moment -r pikaday -r zeroclipboard -r numbro
-// var Handsontable = require('handsontable');
-
-// var data = [
-//   ["", "Ford", "Volvo", "Toyota", "Honda"],
-//   ["2016", 10, 11, 12, 13],
-//   ["2017", 20, 11, 14, 13],
-//   ["2018", 30, 15, 12, 13]
-// ];
-
-var data = [
+[
     {
       "Chi Nhánh Công Ty Cổ Phần Chè Cầu Đất - Đà Lạt": "Địa chỉ: 313 Nguyễn Thị Thập, Phường Tân Phú, Quận 7, Thành phố Hồ Chí Minh"
     },
@@ -98,13 +88,4 @@ var data = [
     {
       "undefined": "LÊ HỒNG CÔNG"
     }
-  ];
-
-var container = document.getElementById('example');
-
-var hot = new Handsontable(container, {
-  data: data,
-  rowHeaders: true,
-  colHeaders: true
-});
-
+  ]
