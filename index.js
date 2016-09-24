@@ -15,6 +15,7 @@ var getDonHang = function(excelFolder){
 		var items = fs.readdirSync(excelFolder);
 	}catch(err){
 		console.log('\033[01;32mPlease put \'Don-hang\' under \'excel-file\' folder');
+		process.exit(1);
 	}
 
 	items.forEach(function(item){
