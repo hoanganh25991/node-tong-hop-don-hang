@@ -4,6 +4,8 @@ var util = require('util');
 
 var natural = require('natural');
 
+var config = require('./lib/config');
+
 var getDonHang = function(excelFolder){
 	var fs = require('fs');
 
@@ -14,7 +16,7 @@ var getDonHang = function(excelFolder){
 	try{
 		var items = fs.readdirSync(excelFolder);
 	}catch(err){
-		console.log('\033[01;32mPlease put \'Don-hang\' under \'excel-file\' folder');
+		console.log('\033[01;32mPlease put \'Don-hang\' under \'excel-file\' folder\033[0m');
 		process.exit(1);
 	}
 
@@ -96,7 +98,7 @@ var getValOfRange = function(rangeString, rangeString2, worksheet){
  * decide where productName in tong-hop file
  */
 
-var config = require('./lib/config');
+
 
 var mostMatch = function(term, list){
 	var loopLength = list.length;
@@ -164,19 +166,21 @@ where.forEach(function(row, donHangX){
 		})() : null;
 
 		var pos = trained.length > 0 ? trained[0].pos : posInListProduct(tmp.name);
-		posList.includes(pos) ? function(){
+		if(posList.includes(pos)){
 			console.log('\033[01;31m[E]\033[0m Don\'t know where to import: %s', tmp.name);
-		}() : function(){
+			return;
+		}else{
 			posList.push(pos);
-		}();
+		}
 		// console.log(tmp.name, pos);
-		pos != -1 ? function(){
+		if(pos != -1){
 			data[pos].push(tmp.name);
 			data[pos].push(tmp.val); //2 san pham cung mot ma > push ko theo cot
-		}() :
-		function(){
+			return;
+		}else{
 			console.log(util.format('\033[01;31m[E]\033[0m File: %s, Product: %s, Val: %s', file, tmp.name, tmp.val));
-		}()
+			return;
+		}
 	});
 
 	//fill in data, which is empty by null
