@@ -38,7 +38,7 @@ var ProductRange = function(worksheet, productList) {
 
 	var found = false;
 
-	var inRange = function(cell, _ref) {
+	var inRange = function(cell, range) {
 		/*
 		cell
 		{
@@ -47,10 +47,10 @@ var ProductRange = function(worksheet, productList) {
 		}
 		*/
 		return (
-			cell.c >= _ref.s.c &&
-			cell.r >= _ref.s.r &&
-			cell.c <= _ref.e.c &&
-			cell.r <= _ref.e.r &&
+			cell.c >= range.s.c &&
+			cell.r >= range.s.r &&
+			cell.c <= range.e.c &&
+			cell.r <= range.e.r &&
 			true
 		);
 
@@ -103,21 +103,21 @@ var ProductRange = function(worksheet, productList) {
 	var m = mostMatch("fucked", productList);
 	console.log(m);
 
-	_ref = {
-		s: {
-			c: 1,
-			r: 0
-		},
-		e: {
-			c: 1,
-			r: 34
-		}
-	};
+	// _ref = {
+	// 	s: {
+	// 		c: 1,
+	// 		r: 0
+	// 	},
+	// 	e: {
+	// 		c: 1,
+	// 		r: 34
+	// 	}
+	// };
 
-	cell = {
-		c: 1,
-		r: 0
-	};
+	// cell = {
+	// 	c: 1,
+	// 	r: 0
+	// };
 	// console.log(cell);
 	// console.log(inRange(cell, _ref));
 	// // console.log(worksheet);
@@ -235,6 +235,7 @@ var ProductRange = function(worksheet, productList) {
 	user.name = askUser('what your name?');
 	
 	this.guess = function(){
+		var cell = _ref.s;
 		while (!found && inRange(cell, _ref)) {
 			var cellRef = Excel.utils.encode_cell(cell);
 			var celVal = worksheet[cellRef] ? worksheet[cellRef].v : '';
@@ -254,13 +255,83 @@ var ProductRange = function(worksheet, productList) {
 				cell.c++;
 			}
 		}
+
+		watcher.started ? (() => {
+		    var startCell = Excel.utils.decode_cell(watcher.signalList[0].cellRef);
+
+		    console.log(startCell);
+
+		    console.log(_ref);
+
+		    var quanityTryRange = {
+		        s: {
+		            c: startCell.c + 1,
+		            r: startCell.r - 2
+		        },
+		        e: {
+		            c: _ref.e.c,
+		            r: startCell.r - 1
+		        }
+		    };
+
+		    var cell = quanityTryRange.s;
+
+		    console.log(quanityTryRange);
+
+		    const QUANITY_MATCH_AT_LEAST = 0.8;
+		    mostMatchPercent = QUANITY_MATCH_AT_LEAST;
+
+		    var mostMatchCol = undefined;
+
+		    while(inRange(cell, quanityTryRange)){
+	    		var cellRef = Excel.utils.encode_cell(cell);
+	    		var cellVal = worksheet[cellRef] ? worksheet[cellRef].v : '';
+		    	console.log(cellVal);
+
+	    		const QUANITY_TITLE = "số lượng theo kg";
+
+	    		var percent = natural.JaroWinklerDistance(cellVal, QUANITY_TITLE);
+
+	    		percent > mostMatchPercent ? (() => {
+	    			mostMatchPercent = percent;
+    				mostMatchCol = cell.c;
+	    		})() : null;
+
+		    	cell.r++;
+		    	if(cell.r > quanityTryRange.e.r){
+		    		cell.r = quanityTryRange.s.r;
+		    		cell.c++;
+		    	}
+		    }
+
+		    console.log(mostMatchPercent);
+
+		    mostMatchCol ? (()=>{
+		    	var cell = Excel.utils.decode_cell(watcher.signalList[0].cellRef);
+		    	watcher.quanityRange = {
+		    		s:{
+		    			c:mostMatchCol,
+		    			r:cell.r
+		    		},
+		    		e:{
+	    				c:mostMatchCol,
+	    				r:cell.r + watcher.successive
+		    		}
+		    	};
+		    })() : null;
+		})() : null;
+
+		this.watcher = watcher;
+
 		return watcher;
 	};
 
-	repl.start(user.name + ':').context.productRange = this;
+	repl.start(user.name + ':').context.watcher = watcher;
 
 	return this;
-
 };
 
-ProductRange(worksheet, productList);
+// var p = ProductRange(worksheet, productList);
+// p.guess();
+
+module.exports = ProductRange;
