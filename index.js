@@ -9,14 +9,14 @@ var getDonHang = function(excelFolder){
 
 	var donHangs = [];
 
+	var items = [];
+
 	try{
 		var items = fs.readdirSync(excelFolder);
 	}catch(err){
 		console.log('\033[01;32mPlease put \'Don-hang\' under \'excel-file\' folder');
 	}
 
-	
-	
 	items.forEach(function(item){
 		var p = /^~\$|^\.|^\../;
 		p.test(item) != true ? function(){
