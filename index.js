@@ -18,9 +18,12 @@ var getDonHang = function(excelFolder){
 		process.exit(1);
 	}
 
+	var path = require('path');
+
 	items.forEach(function(item){
 		var p = /^~\$|^\.|^\../;
 		p.test(item) != true ? function(){
+			if (!path.extname(item).includes('xl')) return; 
 			donHangs.push(item);
 		}() : false;
 	});
