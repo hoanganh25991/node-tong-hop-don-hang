@@ -1,86 +1,85 @@
-var XLSX  = require('xlsx');
+var XLSX = require('xlsx');
 
 var util = require('util');
 
-var p = function(folder, fileName){
-	return util.format('%s/%s', folder, fileName); 
-};
-
-var excelFolder = 'test/excel-file';
-
-var workbook = XLSX.readFile(p(excelFolder, 'Đơn hàng VFFM.xlsx'));
-
-/* This example iterates through every nonempty of every sheet and dumps values: */
-
-// var sheet_name_list = workbook.SheetNames;
-// sheet_name_list.forEach(function(y) { /* iterate through sheets */
-//   var worksheet = workbook.Sheets[y];
-//   for (z in worksheet) {
-//      all keys that do not begin with "!" correspond to cell addresses 
-//     if(z[0] === '!') continue;
-//     console.log(y + "!" + z + "=" + JSON.stringify(worksheet[z].v));
-//   }
-// });
-
-var first_sheet_name = workbook.SheetNames[0];
-var address_of_cell = 'J4';
-
-/* Get worksheet */
-var worksheet = workbook.Sheets[first_sheet_name];
-
-/* Find desired cell */
-var desired_cell = worksheet[address_of_cell];
-
-/* Get the value */
-var desired_value = desired_cell.v;
-
-console.log(desired_value);
-
-var range = {s:{c:5, r:4}, e:{c:5, r:72}};
-
-console.log(XLSX.utils.encode_range(range));
-
-range = XLSX.utils.decode_range('J4:J72');
-
-console.log(range);
-
-var productName = [];
-
-for(var R = range.s.r; R <= range.e.r; ++R) {
-	for(var C = range.s.c; C <= range.e.c; ++C) {
-	var cell_address = {c:C, r:R};
-	 // Find desired cell
-	var address_of_cell = XLSX.utils.encode_cell(cell_address);
-	var desired_cell = worksheet[address_of_cell];
-	console.log(desired_cell.v);
-	productName.push(desired_cell.v);
-	}
-}
-
-range = XLSX.utils.decode_range('V4:V72');
-
-var productQuanity = [];
-
-for(var R = range.s.r; R <= range.e.r; ++R) {
-	for(var C = range.s.c; C <= range.e.c; ++C) {
-	var cell_address = {c:C, r:R};
-	 // Find desired cell
-	var address_of_cell = XLSX.utils.encode_cell(cell_address);
-	var desired_cell = worksheet[address_of_cell];
-	console.log(address_of_cell);
-	// console.log(desired_cell.v);
-	var quanity = desired_cell ? desired_cell.v : 0; //quite WEIRD that cell is not UNDEFINED, they should just doesn't have value
-	console.log(quanity);
-	productQuanity.push(quanity);
-	}
-}
-
-
 var natural = require('natural');
 
-console.log(natural.JaroWinklerDistance('Bắp cải Mini giống Nhật', 'cải mini Nhật'));
-console.log(natural.JaroWinklerDistance('Cà chua panama 250g', 'Cà chua panama'));
-console.log(natural.JaroWinklerDistance('Cà chua panama 500g', 'Cà chua panama'));
+var getDonHang = function(excelFolder){
+	var fs = require('fs');
+
+	var donHangs = [];
+
+	var items = fs.readdirSync(excelFolder);
+	
+	items.forEach(function(item){
+		var p = /^~\$|^\.|^\../;
+		p.test(item) != true ? function(){
+			donHangs.push(item);
+		}() : false;
+	});
+	return donHangs;
+};
+
+/**
+ * tongHop
+ * @type {Array}
+ */
+var tongHop = [];
+
+tongHop.push(['Tên sản phẩm', new Date().toString()]);
+
+var excelFolder = __dirname + '/excel-file';
+
+var donHangs = getDonHang(excelFolder);
+
+
+/**
+ * range for product-name
+ */
+var rl = require('readline-sync');
+var where = [];
+
+donHangs.forEach(function(donHang){
+	var tmp = {file: donHang};
+	tmp.rangeProduct = rl.question(util.format('in \033[01;32m%s\033[0m, where product name :', donHang));
+	tmp.rangeValue = rl.question(util.format('in \033[01;32m%s\033[0m, where product quanity :', donHang));
+	where.push(tmp);
+});
+
+/**
+ * submit a range > get out an array of val
+ * @param  {[type]} rangeString [description]
+ * @param  {[type]} worksheet   [description]
+ * @return {[type]}             [description]
+ */
+var getValOfRange = function(rangeString, rangeString2, worksheet){
+	rangeProduct = XLSX.utils.decode_range(rangeString);
+	rangeVal = XLSX.utils.decode_range(rangeString2);
+
+	var list = [];
+
+	for(var R = rangeProduct.s.r; R <= rangeProduct.e.r; ++R){
+		var tmp = {};
+		var cell_address = {c:rangeProduct.s.c, r:R};
+		var address_of_cell = XLSX.utils.encode_cell(cell_address);
+		var desired_cell = worksheet[address_of_cell];
+		var val = desired_cell ? desired_cell.v : 0;
+		tmp.name = val;
+
+		var cell_address = {c:rangeVal.s.c, r:R};
+		var address_of_cell = XLSX.utils.encode_cell(cell_address);
+		var desired_cell = worksheet[address_of_cell];
+		var val = desired_cell ? desired_cell.v : 0;
+		tmp.val = val;
+		list.push(tmp);
+	}
+
+	return list;
+}
+
+/**
+ * decide where productName in tong-hop file
+ */
 
 var config = require('./lib/config');
 
@@ -101,156 +100,127 @@ var mostMatch = function(term, list){
 	// if(mostMatch < 0.8){
 	// 	pos = -1; //selft determine that, now thing most matched here;
 	// }
+	// console.log(pos);
 	return pos;
 };
 
 
-var matchedOnListProduct = function(term){
+var posInListProduct = function(term){
 	return mostMatch(term, config.products);
 }
 
-console.log(matchedOnListProduct('Hành lá'));
+var data = [];
 
-/* call out repl to work with user */
-// const readline = require('readline');
+config.products.forEach(function(p){
+	var tmp = [];
+	tmp.push(p);
+	data.push(tmp);
+});
 
-// const rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout
-// });
+var headerCompany = [null];
 
-// rl.question('What do you think of Node.js? ', (answer) => {
-//   // TODO: Log the answer in a database
-//   console.log('Thank you for your valuable feedback:', answer);
+// console.log(data);
 
-//   rl.close();
-// });
+where.forEach(function(row, donHangX){
+	var file = row.file;
+	var rangeProduct = row.rangeProduct;
+	var rangeValue = row.rangeValue;
 
-/* wrap function */
-/* read info from range A4: A72 */
-var getRangeVal = function(rangeString, worksheet){
-	range = XLSX.utils.decode_range(rangeString);
+	var workbook = XLSX.readFile(util.format('%s/%s', excelFolder, file));
 
-	var list = [];
+	headerCompany.push('product');
+	headerCompany.push(file.replace('Đơn hàng ', '').replace('.xlsx', ''));
 
-	for(var R = range.s.r; R <= range.e.r; ++R) {
-		for(var C = range.s.c; C <= range.e.c; ++C) {
-			var cell_address = {c:C, r:R};
-			 // Find desired cell
-			var address_of_cell = XLSX.utils.encode_cell(cell_address);
-			var desired_cell = worksheet[address_of_cell];
-			var val = desired_cell ? desired_cell.v : 0;
+	var worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+	var listData = getValOfRange(rangeProduct, rangeValue, worksheet);
+
+	// console.log(listData);
+	
+	var posList = [];
+	
+	listData.forEach(function(tmp){
+		var trained = config.trainList.filter((val)=>{
+			return (val.similar == tmp.name);
+		});
+
+		trained.length > 1 ? (()=>{
+			console.log('\033[01;31m[E]\033[0m You have train \033[01;32m%s\033[0m more than 1 time, please fix it', tmp.name);
+		})() : null;
+
+		var pos = trained.length > 0 ? trained[0].pos : posInListProduct(tmp.name);
+		posList.includes(pos) ? function(){
+			console.log('\033[01;31m[E]\033[0m Don\'t know where to import: %s', tmp.name);
+		}() : function(){
+			posList.push(pos);
+		}();
+		// console.log(tmp.name, pos);
+		pos != -1 ? function(){
+			data[pos].push(tmp.name);
+			data[pos].push(tmp.val); //2 san pham cung mot ma > push ko theo cot
+		}() :
+		function(){
+			console.log(util.format('\033[01;31m[E]\033[0m File: %s, Product: %s, Val: %s', file, tmp.name, tmp.val));
+		}()
+	});
+
+	//fill in data, which is empty by null
+	data.forEach(function(row){
+		//the first index is product-name
+		var pos = donHangX * 2;
+		row[(pos + 1)] == undefined ? function(){
+			row[(pos + 1)] = null;
+			row[(pos + 2)] = null;
+		}(): false;
+	});
+});
+
+tongHop.push(headerCompany);
+
+data.forEach(function(rd){
+	tongHop.push(rd);
+});
+
+// console.log(tongHop);
+function sheet_from_array_of_arrays(data, opts) {
+	var ws = {};
+	var range = {s: {c:10000000, r:10000000}, e: {c:0, r:0 }};
+	for(var R = 0; R != data.length; ++R) {
+		for(var C = 0; C != data[R].length; ++C) {
+			if(range.s.r > R) range.s.r = R;
+			if(range.s.c > C) range.s.c = C;
+			if(range.e.r < R) range.e.r = R;
+			if(range.e.c < C) range.e.c = C;
+			var cell = {v: data[R][C] };
+			if(cell.v == null) continue;
+			var cell_ref = XLSX.utils.encode_cell({c:C,r:R});
 			
-			list.push(val);
+			if(typeof cell.v === 'number') cell.t = 'n';
+			else if(typeof cell.v === 'boolean') cell.t = 'b';
+			else if(cell.v instanceof Date) {
+				cell.t = 'n'; cell.z = XLSX.SSF._table[14];
+				cell.v = datenum(cell.v);
+			}
+			else cell.t = 's';
+			
+			ws[cell_ref] = cell;
 		}
 	}
-	return list;
+	if(range.s.c < 10000000) ws['!ref'] = XLSX.utils.encode_range(range);
+	return ws;
 }
+function Workbook() {
+	if(!(this instanceof Workbook)) return new Workbook();
+	this.SheetNames = [];
+	this.Sheets = {};
+}
+var wb = new Workbook(), ws = sheet_from_array_of_arrays(tongHop);
+/* add worksheet to workbook */
+var ws_name = 'don-hang';
+wb.SheetNames.push(ws_name);
+wb.Sheets[ws_name] = ws;
 
-console.log(getRangeVal('J4:J72', worksheet));
-
-// var fs = require('fs');
-
-// fs.readdir(excelFolder, function(err, items) {
-// 	items.forEach(function(item){
-// 		var p = /^~\$/g;
-// 		console.log(p.test(item));
-// 	});
-// });
-
-var workbook = XLSX.readFile(p(excelFolder, 'Đơn hàng VFFM.xlsx'));
-
-var first_sheet_name = workbook.SheetNames[0];
-
-var worksheet = workbook.Sheets[first_sheet_name];
-
-var list_DonHang = function(excelFolder){
-	var fs = require('fs');
-
-	var list_DonHang = [];
-
-	var items = fs.readdirSync(excelFolder);
-	console.log(items);
-	items.forEach(function(item){
-		var p = /^~\$|^\.|^\../;
-		console.log(p.test(item));
-		p.test(item) != true ? function(){
-			list_DonHang.push(item);
-		}() : false;
-	});
-	return list_DonHang;
-};
-
-console.log(list_DonHang(excelFolder));
-var listDonHang = list_DonHang(excelFolder);
-/* bookType can be 'xlsx' or 'xlsm' or 'xlsb' */
-// var wopts = { bookType:'xlsx', bookSST:false, type:'binary' };
-
-// var wbout = XLSX.write(workbook,wopts);
-
-// function s2ab(s) {
-//   var buf = new ArrayBuffer(s.length);
-//   var view = new Uint8Array(buf);
-//   for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-//   return buf;
-// }
-
-// /* the saveAs call downloads a file on the local machine */
-// saveAs(new Blob([s2ab(wbout)],{type:""}), "test.xlsx")
-
-// var Excel = require('exceljs');
-
-// var file_TongHop = new Excel.Workbook();
-
-// file_TongHop.creator = 'Anh Le Hoang';
-// file_TongHop.lastModifiedBy = 'Anh Le Hoang';
-// file_TongHop.created = new Date(1991, 9, 25);
-// file_TongHop.modified = new Date();
-
-// var sheet = file_TongHop.addWorksheet('don-hang');
-
-// file_TongHop.xlsx
-// 		.writeFile('tong-hop.xlsx')
-// 		.then(function() {
-// 			console.log('save to tong-hop');
-// 		});
-
-//read back from file_TongHop by xlsx
-
-// var file_TongHop = XLSX.readFile('tong hop 1.xlsx');
-
-// var sheet1 = file_TongHop.Sheets[file_TongHop.SheetNames[0]];
-
-// sheet1['A1'].v = 'product name';
-
-// console.log(sheet1['A1'].v);
-
-// XLSX.writeFile(file_TongHop);
-
-var arr = [];
-
-var repl = require('repl');
-
-arr.push(['product name', 'company name']);
-
-var readWhere = {};
-
-var readlineSync = require('readline-sync');
-
-// console.log(listDonHang);
-
-listDonHang.forEach(function(donHang){
-	readWhere[donHang] = readlineSync.question(util.format('in \033[01;32m%s\033[0m, where product name :', donHang));
-});
-
-console.log(readWhere);
-
-process.on('exit', function(){
-	console.log('build sucesss');
-});
-
-
-var a = 'Đơn hàng ';
-
-
-
+/* write file */
+var x = 'tong-hop.xlsx';
+XLSX.writeFile(wb, x);
+console.log(util.format('write file success: \033[01;32m%s\033[0m', x));

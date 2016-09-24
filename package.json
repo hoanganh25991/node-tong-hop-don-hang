@@ -5,15 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index2.js"
+    "start": "node index.js"
   },
   "author": "Anh Le Hoang",
   "license": "MIT",
   "dependencies": {
-    "cli-table": "^0.3.1",
-    "columnify": "^1.5.4",
-    "exceljs": "^0.2.24",
-    "handsontable": "^0.28.0",
     "natural": "^0.4.0",
     "readline-sync": "^1.4.4",
     "xlsx": "^0.8.0"
