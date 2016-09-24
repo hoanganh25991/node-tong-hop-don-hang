@@ -128,6 +128,7 @@ where.forEach(function(row, donHangX){
 
 	var workbook = XLSX.readFile(util.format('%s/%s', excelFolder, file));
 
+	headerCompany.push('product');
 	headerCompany.push(file.replace('Đơn hàng ', '').replace('.xlsx', ''));
 
 	var worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -136,10 +137,26 @@ where.forEach(function(row, donHangX){
 
 	// console.log(listData);
 	
+	var posList = [];
+	
 	listData.forEach(function(tmp){
-		var pos = posInListProduct(tmp.name);
+		var trained = config.trainList.filter((val)=>{
+			return (val.similar == tmp.name);
+		});
+
+		trained.length > 1 ? (()=>{
+			console.log('\033[01;31m[E]\033[0m You have train \033[01;32m%s\033[0m more than 1 time, please fix it', tmp.name);
+		})() : null;
+
+		var pos = trained.length > 0 ? trained[0].pos : posInListProduct(tmp.name);
+		posList.includes(pos) ? function(){
+			console.log('\033[01;31m[E]\033[0m Don\'t know where to import: %s', tmp.name);
+		}() : function(){
+			posList.push(pos);
+		}();
 		// console.log(tmp.name, pos);
 		pos != -1 ? function(){
+			data[pos].push(tmp.name);
 			data[pos].push(tmp.val); //2 san pham cung mot ma > push ko theo cot
 		}() :
 		function(){
@@ -150,8 +167,10 @@ where.forEach(function(row, donHangX){
 	//fill in data, which is empty by null
 	data.forEach(function(row){
 		//the first index is product-name
-		row[(donHangX + 1)] == undefined ? function(){
-			row[(donHangX + 1)] = null;
+		var pos = donHangX * 2;
+		row[(pos + 1)] == undefined ? function(){
+			row[(pos + 1)] = null;
+			row[(pos + 2)] = null;
 		}(): false;
 	});
 });
