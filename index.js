@@ -9,7 +9,13 @@ var getDonHang = function(excelFolder){
 
 	var donHangs = [];
 
-	var items = fs.readdirSync(excelFolder);
+	try{
+		var items = fs.readdirSync(excelFolder);
+	}catch(err){
+		console.log('\033[01;32mPlease put \'Don-hang\' under \'excel-file\' folder');
+	}
+
+	
 	
 	items.forEach(function(item){
 		var p = /^~\$|^\.|^\../;
@@ -19,6 +25,7 @@ var getDonHang = function(excelFolder){
 	});
 	return donHangs;
 };
+
 
 /**
  * tongHop
@@ -31,6 +38,10 @@ tongHop.push(['Tên sản phẩm', new Date().toString()]);
 var excelFolder = __dirname + '/excel-file';
 
 var donHangs = getDonHang(excelFolder);
+
+!(donHangs.length > 0) ? function(){
+	console.log('\033[01;32mPlease put \'Don-hang\' under \'excel-file\' folder');
+}() : null;
 
 
 /**
@@ -209,6 +220,7 @@ function sheet_from_array_of_arrays(data, opts) {
 	if(range.s.c < 10000000) ws['!ref'] = XLSX.utils.encode_range(range);
 	return ws;
 }
+
 function Workbook() {
 	if(!(this instanceof Workbook)) return new Workbook();
 	this.SheetNames = [];
@@ -223,4 +235,6 @@ wb.Sheets[ws_name] = ws;
 /* write file */
 var x = 'tong-hop.xlsx';
 XLSX.writeFile(wb, x);
-console.log(util.format('write file success: \033[01;32m%s\033[0m', x));
+(donHangs.length > 0) ? function(){
+	console.log(util.format('write file success: \033[01;32m%s\033[0m', x));
+}() : null;
